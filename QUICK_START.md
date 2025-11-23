@@ -54,6 +54,10 @@ source venv/bin/activate
 ### 2️⃣ Instalar Dependencias
 
 ```bash
+# Windows
+pip install -r requirements-windows.txt
+
+# macOS/Linux
 pip install -r requirements.txt
 ```
 

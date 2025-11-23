@@ -38,8 +38,8 @@ Odin implementa un sistema robusto de autenticación JWT con FastAPI Users, incl
 
 ### Servidor
 - **Uvicorn** (0.38.0) - Servidor ASGI
-- **uvloop** (0.22.1) - Event loop de alto rendimiento
-- **httptools** (0.7.1) - Parseo HTTP optimizado
+- **uvloop** (0.22.1) - Event loop de alto rendimiento (solo Linux/macOS)
+- **httptools** (0.7.1) - Parseo HTTP optimizado (solo Linux/macOS)
 
 ### Utilidades
 - **python-dotenv** (1.2.1) - Gestión de variables de entorno
@@ -146,6 +146,10 @@ source venv/bin/activate
 #### 3. Instalar dependencias
 
 ```bash
+# Windows
+pip install -r requirements-windows.txt
+
+# macOS/Linux
 pip install -r requirements.txt
 ```
 
@@ -400,6 +404,17 @@ docker-compose ps
 | `SECRET_KEY` | Clave secreta para JWT | `tu-clave-super-segura` |
 
 **⚠️ Importante**: En producción, cambiar `SECRET_KEY` a una cadena aleatoria y segura.
+
+## 📦 Archivos de Requisitos
+
+El proyecto incluye múltiples archivos de requisitos para diferentes plataformas:
+
+| Archivo | Plataforma | Descripción |
+|---------|-----------|-------------|
+| `requirements.txt` | macOS/Linux | Dependencias estándar sin optimizaciones específicas |
+| `requirements-windows.txt` | Windows | Dependencias compatibles con Windows (sin `uvloop` ni `httptools`) |
+
+**Nota**: `uvloop` y `httptools` no son compatibles con Windows, por lo que se excluyen del archivo `requirements-windows.txt`. Estas librerías optimizan el rendimiento en sistemas Unix-like, pero no son esenciales para el funcionamiento de la API.
 
 ## 🔄 Migraciones de Base de Datos
 
