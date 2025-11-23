@@ -4,9 +4,9 @@ from fastapi_users.authentication import (
     BearerTransport,
     JWTStrategy,
 )
-from app.models.user import User
+from app.users.models import User
 from app.config import settings
-from app.core.users import get_user_manager
+from app.users.services import get_user_manager
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 

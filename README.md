@@ -52,28 +52,80 @@ Odin implementa un sistema robusto de autenticación JWT con FastAPI Users, incl
 ```
 Odin/
 ├── app/
-│   ├── api/
+│   ├── users/                   # Dominio de usuarios
 │   │   ├── __init__.py
-│   │   └── routes/
-│   │       ├── auth.py          # Rutas de autenticación
-│   │       └── users.py         # Rutas de gestión de usuarios
+│   │   ├── models.py           # Modelo de usuario (SQLAlchemy)
+│   │   ├── schemas.py          # Esquemas Pydantic para usuarios
+│   │   ├── routes.py           # Endpoints de gestión de usuarios
+│   │   └── services.py         # Lógica de negocio de usuarios
+│   ├── auth/                    # Dominio de autenticación
+│   │   ├── __init__.py
+│   │   └── routes.py           # Endpoints de autenticación
+│   ├── api/
+│   │   └── __init__.py         # Router principal que agrupa dominios
 │   ├── core/
-│   │   ├── security.py          # Configuración de seguridad y JWT
-│   │   └── users.py             # Lógica de gestión de usuarios
-│   ├── models/
-│   │   └── user.py              # Modelo de usuario (SQLAlchemy)
-│   ├── schemas/
-│   │   └── user.py              # Esquemas Pydantic para usuarios
-│   ├── config.py                # Configuración de la aplicación
-│   ├── database.py              # Configuración de base de datos
-│   └── main.py                  # Punto de entrada de la aplicación
-├── alembic/                     # Migraciones de base de datos
-├── alembic.ini                  # Configuración de Alembic
-├── docker-compose.yml           # Orquestación de contenedores
-├── Dockerfile                   # Imagen Docker de la aplicación
-├── requirements.txt             # Dependencias de Python
-└── README.md                    # Este archivo
+│   │   └── security.py         # Configuración de seguridad y JWT
+│   ├── models/                  # Compatibilidad con Alembic
+│   │   ├── __init__.py         # Re-exporta modelos
+│   │   └── user.py             # Modelo original (compatibilidad)
+│   ├── schemas/                 # Compatibilidad
+│   │   └── __init__.py         # Re-exporta esquemas
+│   ├── config.py               # Configuración de la aplicación
+│   ├── database.py             # Configuración de base de datos
+│   └── main.py                 # Punto de entrada de la aplicación
+├── alembic/                    # Migraciones de base de datos
+├── alembic.ini                 # Configuración de Alembic
+├── docker-compose.yml          # Orquestación de contenedores
+├── Dockerfile                  # Imagen Docker de la aplicación
+├── requirements.txt            # Dependencias de Python
+├── requirements-windows.txt    # Dependencias compatibles con Windows
+├── Odin_API.postman_collection.json  # Colección de Postman
+└── README.md                   # Este archivo
 ```
+
+## 🏗️ Arquitectura por Dominios
+
+Odin utiliza una **arquitectura por dominios** (Domain-Driven Design) que organiza el código por funcionalidades de negocio en lugar de por tipo de archivo.
+
+### 🎯 Ventajas de esta Arquitectura:
+
+- **✅ Cohesión alta**: Todo relacionado con una funcionalidad está junto
+- **✅ Acoplamiento bajo**: Los dominios son independientes entre sí
+- **✅ Escalabilidad**: Fácil agregar nuevas funcionalidades
+- **✅ Mantenibilidad**: Cambios localizados en cada dominio
+- **✅ Trabajo en equipo**: Cada desarrollador puede trabajar en su dominio
+
+### 📦 Estructura de un Dominio:
+
+Cada dominio sigue la misma estructura consistente:
+
+```
+app/nombre_dominio/
+├── __init__.py         # Paquete Python
+├── models.py          # Modelos de base de datos (SQLAlchemy)
+├── schemas.py         # Validación de datos (Pydantic)
+├── routes.py          # Endpoints HTTP (FastAPI)
+└── services.py        # Lógica de negocio
+```
+
+### 🔄 Agregar un Nuevo Dominio:
+
+1. **Crear la estructura**:
+   ```bash
+   mkdir app/products
+   touch app/products/{__init__.py,models.py,schemas.py,routes.py,services.py}
+   ```
+
+2. **Registrar en el router principal** (`app/api/__init__.py`):
+   ```python
+   from app.products.routes import router as products_router
+   api_router.include_router(products_router, prefix="/products", tags=["products"])
+   ```
+
+3. **Agregar modelos a Alembic** (si es necesario) (`alembic/env.py`):
+   ```python
+   from app.products.models import Product
+   ```
 
 ## 🚀 Instalación y Configuración
 
@@ -135,6 +187,7 @@ cd Odin
 
 ```bash
 # En Windows
+source venv/Scripts/activate # PARA GIT BASH 
 python -m venv venv
 venv\Scripts\activate
 
@@ -446,14 +499,35 @@ alembic downgrade -1
 
 Se recomienda agregar tests unitarios e integración usando `pytest`.
 
-## 📖 Documentación Interactiva
+## 📖 Documentación y Testing
+
+### 🌐 Documentación Interactiva
 
 Una vez que la API esté corriendo, accede a:
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-Aquí puedes probar todos los endpoints directamente.
+### 📮 Colección de Postman
+
+El proyecto incluye una colección completa de Postman para probar todos los endpoints:
+
+1. **Importar en Postman**: 
+   - File → Import → Seleccionar `Odin_API.postman_collection.json`
+
+2. **Flujo de pruebas recomendado**:
+   - Health Check → Register User → Login → Get Current User
+
+3. **Variables automáticas**:
+   - Los tokens JWT se guardan automáticamente
+   - Variables de entorno preconfiguradas
+   - Scripts de prueba incluidos
+
+### 🧪 Endpoints Disponibles
+
+- **Health**: `GET /health` - Estado de la API
+- **Auth**: `POST /auth/register`, `POST /auth/jwt/login`, `POST /auth/jwt/logout`
+- **Users**: `GET /users/me`, `PATCH /users/me`, `GET /users/{id}`
 
 ## 🤝 Contribuciones
 
