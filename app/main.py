@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import api_router
 from app.core.security import fastapi_users
-from app.schemas.user import UserRead, UserUpdate
+from app.users.schemas import UserRead, UserUpdate
 
 app = FastAPI(
     title="Mi API con FastAPI Users",

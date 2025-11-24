@@ -13,7 +13,8 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from app.config import settings
 from app.database import Base
 # Importar TODOS los modelos aquí para que Alembic los detecte
-from app.models.user import User
+from app.users.models import User
+from app.products.models import Product  # Agregar import
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
