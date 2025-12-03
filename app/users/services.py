@@ -6,6 +6,7 @@ from app.users.schemas import UserCreate
 from app.database import get_async_session
 from fastapi_users.db import SQLAlchemyUserDatabase
 from app.config import settings
+from app.core.roles import RoleEnum
 
 # Constantes para tokens
 SECRET = settings.SECRET_KEY
@@ -15,7 +16,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     verification_token_secret = SECRET
     
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        print(f"Usuario {user.email} se ha registrado.")
+        print(f"Usuario {user.email} se ha registrado con rol: {user.role}")
     
     async def on_after_forgot_password(
         self, user: User, token: str, request: Optional[Request] = None
@@ -43,6 +44,10 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
         user_dict["is_active"] = True
         user_dict["is_superuser"] = False
         user_dict["is_verified"] = False
+        
+        # Si no se proporciona rol, asignar USUARIO por defecto
+        if "role" not in user_dict or user_dict["role"] is None:
+            user_dict["role"] = RoleEnum.USUARIO
         
         # Hashear la contraseña
         password = user_dict.pop("password")
