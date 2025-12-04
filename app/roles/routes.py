@@ -109,6 +109,34 @@ async def get_permissions_by_role(
     return permissions
 
 
+@router.patch("/{user_id}", response_model=UserRead)
+async def update_user_role(
+    user_id: int,
+    request: AssignRoleRequest,
+    db: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(require_superadmin)
+):
+    """
+    Actualiza el rol de un usuario.
+    Solo SUPERADMIN puede ejecutar esta acción.
+    
+    Args:
+        user_id: ID del usuario a actualizar
+        request: Contiene el nuevo role
+        db: Sesión de base de datos
+        current_user: Usuario autenticado (debe ser SUPERADMIN)
+    """
+    user = await RoleService.assign_role(db, user_id, request.role)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    
+    return user
+
+
 @router.get("/my-role", response_model=dict)
 async def get_my_role(current_user: User = Depends(current_active_user)):
     """

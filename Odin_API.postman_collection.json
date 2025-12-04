@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "odin-api-collection",
-		"name": "Odin API - FastAPI Users",
-		"description": "Colección completa para probar la API de Odin con autenticación JWT",
+		"name": "Odin API - FastAPI Users with Roles",
+		"description": "Colección completa para probar la API de Odin con autenticación JWT y sistema de roles jerárquico (SUPERADMIN, ADMIN, EMPRESA, USUARIO)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -101,6 +101,11 @@
 									"    const response = pm.response.json();",
 									"    pm.environment.set('access_token', response.access_token);",
 									"    pm.environment.set('token_type', response.token_type);",
+									"    if (response.user) {",
+									"        pm.environment.set('user_id', response.user.id);",
+									"        pm.environment.set('user_role', response.user.role);",
+									"        pm.environment.set('user_email', response.user.email);",
+									"    }",
 									"}"
 								],
 								"type": "text/javascript"
@@ -321,6 +326,231 @@
 							"path": [
 								"users",
 								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Roles Management",
+			"item": [
+				{
+					"name": "Get Roles Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles/info",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Roles Hierarchy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/roles/hierarchy",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"hierarchy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Role",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/my-role",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"my-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Role to User (SuperAdmin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 2,\n  \"role\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/assign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Role (SuperAdmin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 2,\n  \"role\": \"empresa\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users by Role (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/users?role=admin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"users"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "admin"
+								},
+								{
+									"key": "skip",
+									"value": "0",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "100",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Permission (SuperAdmin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"role\": \"admin\",\n  \"permission\": \"users.delete\",\n  \"description\": \"Permiso para eliminar usuarios\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Permissions by Role",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/permissions?role=admin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"permissions"
+							],
+							"query": [
+								{
+									"key": "role",
+									"value": "admin"
+								}
 							]
 						}
 					},

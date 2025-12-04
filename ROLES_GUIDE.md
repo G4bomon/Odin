@@ -295,11 +295,57 @@ POST /auth/register
 }
 ```
 
-El usuario se creará con rol `USUARIO` por defecto.
+El usuario se creará automáticamente con rol `USUARIO` por defecto.
 
-### Asignar Rol Diferente
+**Respuesta:**
 
-Después de crear el usuario, un SUPERADMIN debe usar el endpoint `/roles/assign` para cambiar el rol.
+```json
+{
+  "id": 1,
+  "email": "usuario@example.com",
+  "first_name": "Juan",
+  "last_name": "Pérez",
+  "role": "usuario",
+  "is_active": true,
+  "is_verified": false
+}
+```
+
+### Cambiar Rol de un Usuario
+
+Después de crear el usuario, un **SUPERADMIN** puede cambiar su rol usando uno de estos endpoints:
+
+#### Opción 1: POST /roles/assign
+
+```
+POST /roles/assign
+```
+
+**Body:**
+
+```json
+{
+  "user_id": 2,
+  "role": "admin"
+}
+```
+
+#### Opción 2: PATCH /roles/{user_id}
+
+```
+PATCH /roles/2
+```
+
+**Body:**
+
+```json
+{
+  "user_id": 2,
+  "role": "empresa"
+}
+```
+
+Ambos endpoints requieren autenticación como **SUPERADMIN** y devuelven el usuario actualizado con su nuevo rol.
 
 ## Ejemplos de Uso
 
