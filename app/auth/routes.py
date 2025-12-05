@@ -1,13 +1,36 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.core.security import fastapi_users, auth_backend
 from app.users.schemas import UserRead, UserCreate
+from app.auth.schemas import LoginRequest
+from app.auth.services import AuthService
+from app.users.services import get_user_manager
+from fastapi_users import models
+from fastapi_users.manager import BaseUserManager
 
 router = APIRouter()
 
-# Router de autenticación JWT
+# Endpoint de login con JSON
+@router.post("/jwt/login", name="auth:jwt.login")
+async def login_json(
+    credentials: LoginRequest,
+    user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
+):
+    """
+    Endpoint de login que acepta JSON en lugar de FormData.
+    
+    Envía las credenciales en formato JSON:
+    {
+        "email": "user@example.com",
+        "password": "yourpassword"
+    }
+    """
+    return await AuthService.authenticate_user(credentials, user_manager)
+
+# Router de autenticación JWT original (FormData) - mantener para compatibilidad
 router.include_router(
     fastapi_users.get_auth_router(auth_backend),
-    prefix="/jwt",
+    prefix="/jwt/form",
+    tags=["auth-formdata"]
 )
 
 # Router de registro
