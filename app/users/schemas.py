@@ -17,7 +17,6 @@ class UserCreate(BaseModel):
     password: str = Field(..., min_length=8, description="Mínimo 8 caracteres")
     first_name: Optional[str] = Field(None, max_length=50)
     last_name: Optional[str] = Field(None, max_length=50)
-    role: RoleEnum = Field(default=RoleEnum.USUARIO, description="Rol del usuario")
     
     class Config:
         extra = "forbid"  # Rechazar cualquier campo adicional
