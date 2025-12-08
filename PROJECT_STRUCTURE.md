@@ -6,48 +6,70 @@ Documentación detallada de la estructura y componentes del proyecto.
 
 ```
 Odin/
-├── app/                          # Código principal de la aplicación
-│   ├── __init__.py
-│   ├── main.py                   # Punto de entrada de FastAPI
-│   ├── config.py                 # Configuración de la aplicación
-│   ├── database.py               # Configuración de base de datos
-│   │
-│   ├── api/                      # Rutas y endpoints
-│   │   ├── __init__.py           # Router principal
-│   │   └── routes/
-│   │       ├── auth.py           # Endpoints de autenticación
-│   │       └── users.py          # Endpoints de gestión de usuarios
-│   │
-│   ├── core/                     # Lógica central
-│   │   ├── security.py           # Configuración JWT y autenticación
-│   │   └── users.py              # Lógica de gestión de usuarios
-│   │
-│   ├── models/                   # Modelos de base de datos (SQLAlchemy)
-│   │   └── user.py               # Modelo de usuario
-│   │
-│   └── schemas/                  # Esquemas Pydantic (validación)
-│       └── user.py               # Esquemas de usuario
-│
-├── alembic/                      # Migraciones de base de datos
-│   ├── versions/                 # Archivos de migración
-│   ├── env.py                    # Configuración de Alembic
-│   └── script.py.mako            # Template de migración
-│
-├── .env.example                  # Ejemplo de variables de entorno
-├── .env                          # Variables de entorno (no versionado)
-├── .gitignore                    # Archivos a ignorar en Git
-├── .dockerignore                 # Archivos a ignorar en Docker
-├── alembic.ini                   # Configuración de Alembic
-├── docker-compose.yml            # Orquestación de contenedores
-├── Dockerfile                    # Imagen Docker de la aplicación
-├── requirements.txt              # Dependencias de Python
-├── README.md                     # Documentación principal
-├── QUICK_START.md                # Guía rápida de inicio
-├── CONTRIBUTING.md               # Guía de contribuciones
-└── PROJECT_STRUCTURE.md          # Este archivo
+├── app/
+│   ├── users/                   # Dominio de usuarios
+│   │   ├── __init__.py
+│   │   ├── models.py           # Modelo de usuario (SQLAlchemy)
+│   │   ├── schemas.py          # Esquemas Pydantic para usuarios
+│   │   ├── routes.py           # Endpoints de gestión de usuarios
+│   │   └── services.py         # Lógica de negocio de usuarios
+│   ├── auth/                    # Dominio de autenticación
+│   │   ├── __init__.py
+│   │   └── routes.py           # Endpoints de autenticación
+│   ├── api/
+│   │   └── __init__.py         # Router principal que agrupa dominios
+│   ├── core/
+│   │   └── security.py         # Configuración de seguridad y JWT
+│   ├── models/                  # Compatibilidad con Alembic
+│   │   ├── __init__.py         # Re-exporta modelos
+│   │   └── user.py             # Modelo original (compatibilidad)
+│   ├── schemas/                 # Compatibilidad
+│   │   └── __init__.py         # Re-exporta esquemas
+│   ├── config.py               # Configuración de la aplicación
+│   ├── database.py             # Configuración de base de datos
+│   └── main.py                 # Punto de entrada de la aplicación
+├── alembic/                    # Migraciones de base de datos
+├── alembic.ini                 # Configuración de Alembic
+├── docker-compose.yml          # Orquestación de contenedores
+├── Dockerfile                  # Imagen Docker de la aplicación
+├── requirements.txt            # Dependencias de Python
+├── requirements-windows.txt    # Dependencias compatibles con Windows
+├── Odin_API.postman_collection.json  # Colección de Postman
+├── README.md                   # Documentación principal
+├── QUICK_START.md              # Guía rápida de inicio
+├── CONTRIBUTING.md             # Guía de contribuciones
+└── PROJECT_STRUCTURE.md        # Este archivo
 ```
 
-## 📄 Descripción de Archivos Principales
+## 🏗️ Arquitectura por Dominios
+
+Odin utiliza una **arquitectura por dominios** (Domain-Driven Design) que organiza el código por funcionalidades de negocio.
+
+### 📦 Estructura de un Dominio
+
+Cada dominio sigue esta estructura consistente:
+
+```
+app/nombre_dominio/
+├── __init__.py         # Paquete Python
+├── models.py          # Modelos de base de datos (SQLAlchemy)
+├── schemas.py         # Validación de datos (Pydantic)
+├── routes.py          # Endpoints HTTP (FastAPI)
+└── services.py        # Lógica de negocio
+```
+
+### 🎯 Dominios Actuales
+
+#### 👥 Users Domain (`app/users/`)
+- **models.py**: Modelo `User` con FastAPI Users
+- **schemas.py**: `UserRead`, `UserCreate`, `UserUpdate`
+- **routes.py**: Endpoints `/me`, `/profile`, `/admin-only`
+- **services.py**: `UserManager` con hooks de eventos
+
+#### 🔐 Auth Domain (`app/auth/`)
+- **routes.py**: Endpoints `/register`, `/jwt/login`, `/jwt/logout`
+
+## Descripción de Archivos Principales
 
 ### `app/main.py`
 

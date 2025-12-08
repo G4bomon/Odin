@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from app.models.user import User
+from app.users.models import User
 from app.core.security import current_active_user, current_superuser
 from typing import List
 
