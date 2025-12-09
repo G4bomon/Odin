@@ -91,7 +91,7 @@
 					"response": []
 				},
 				{
-					"name": "Login (JWT)",
+					"name": "Login (JWT - JSON)",
 					"event": [
 						{
 							"listen": "test",
@@ -117,23 +117,12 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded"
+								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "username",
-									"value": "{{test_email}}",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "{{test_password}}",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/jwt/login",
@@ -551,6 +540,696 @@
 									"key": "role",
 									"value": "admin"
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ubicaciones",
+			"item": [
+				{
+					"name": "Create Ubicacion",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('ubicacion_id', response.id);",
+									"    pm.environment.set('ubicacion_string_id', response.ubicacion_id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ubicacion_id\": \"ubicacion_test_001\",\n  \"name\": \"Ubicación de Prueba\",\n  \"description\": \"Ubicación para pruebas con teléfono móvil\",\n  \"location\": \"Oficina Principal\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/ubicaciones",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ubicaciones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Ubicaciones",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/ubicaciones?skip=0&limit=100",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ubicaciones"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "100"
+								},
+								{
+									"key": "is_active",
+									"value": "true",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ubicacion by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/ubicaciones/{{ubicacion_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ubicaciones",
+								"{{ubicacion_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ubicacion Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/ubicaciones/{{ubicacion_id}}/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ubicaciones",
+								"{{ubicacion_id}}",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ubicacion",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Ubicación Actualizada\",\n  \"description\": \"Descripción modificada\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/ubicaciones/{{ubicacion_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ubicaciones",
+								"{{ubicacion_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Ubicacion",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/ubicaciones/{{ubicacion_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ubicaciones",
+								"{{ubicacion_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cameras",
+			"item": [
+				{
+					"name": "Create Camera",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('camera_id', response.id);",
+									"    pm.environment.set('camera_mac', response.mac);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mac\": \"AA:BB:CC:DD:EE:01\",\n  \"name\": \"Teléfono Móvil - Test\",\n  \"model\": \"Smartphone Camera\",\n  \"ip_address\": \"192.168.1.100\",\n  \"orientacion\": \"Frontal\",\n  \"ubicacion_id\": 1,\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cameras",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cameras"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Cameras",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cameras?skip=0&limit=100",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cameras"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "100"
+								},
+								{
+									"key": "ubicacion_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "is_active",
+									"value": "true",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Camera by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cameras/{{camera_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cameras",
+								"{{camera_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Camera by MAC",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cameras/mac/{{camera_mac}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cameras",
+								"mac",
+								"{{camera_mac}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Camera Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cameras/{{camera_id}}/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cameras",
+								"{{camera_id}}",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Camera",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Cámara Actualizada\",\n  \"orientacion\": \"45° Norte\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/cameras/{{camera_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cameras",
+								"{{camera_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Camera",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/cameras/{{camera_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"cameras",
+								"{{camera_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Detections",
+			"item": [
+				{
+					"name": "Upload Detection from Camera/Mobile (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.detection_id) {",
+									"        pm.environment.set('detection_id', response.detection_id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "patio_id",
+									"value": "patio_001",
+									"type": "text"
+								},
+								{
+									"key": "mac",
+									"value": "AA:BB:CC:DD:EE:01",
+									"type": "text"
+								},
+								{
+									"key": "image_path",
+									"value": "/path/to/image.jpg",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/detections/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"detections",
+								"upload"
+							]
+						},
+						"description": "Endpoint público para que cámaras o móviles envíen detecciones. No requiere autenticación."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Detection (Manual)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('detection_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ubicacion_id\": 1,\n  \"camera_id\": 1,\n  \"image_path\": \"/uploads/test.jpg\",\n  \"detection_type\": \"person\",\n  \"confidence\": 0.95\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/detections",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"detections"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Detections",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/detections?skip=0&limit=100",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"detections"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "0"
+								},
+								{
+									"key": "limit",
+									"value": "100"
+								},
+								{
+									"key": "ubicacion_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "camera_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "processed",
+									"value": "false",
+									"disabled": true
+								},
+								{
+									"key": "detection_type",
+									"value": "person",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Detection Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/detections/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"detections",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Detection by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/detections/{{detection_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"detections",
+								"{{detection_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Detection with Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/detections/{{detection_id}}/details",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"detections",
+								"{{detection_id}}",
+								"details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Detection",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"detection_type\": \"person\",\n  \"confidence\": 0.98,\n  \"processed\": true,\n  \"processing_time\": 1.5,\n  \"objects_detected\": {\n    \"person\": 1,\n    \"confidence\": 0.98\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/detections/{{detection_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"detections",
+								"{{detection_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Detection",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/detections/{{detection_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"detections",
+								"{{detection_id}}"
 							]
 						}
 					},

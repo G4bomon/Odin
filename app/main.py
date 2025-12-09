@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.api import api_router
 from app.core.security import fastapi_users
 from app.users.schemas import UserRead, UserUpdate
+import os
 
 app = FastAPI(
     title="Mi API con FastAPI Users",
@@ -49,3 +52,14 @@ async def health_check():
     Verificar el estado de la API
     """
     return {"status": "healthy"}
+
+
+@app.get("/mobile", tags=["mobile"])
+async def serve_mobile_app():
+    """
+    Servir la aplicación móvil de prueba
+    """
+    file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "mobile_test_app.html")
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    return {"error": "Mobile app not found"}

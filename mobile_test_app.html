@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Odin Vision - Test Móvil</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 10px;
+        font-size: 28px;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .camera-container {
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      #preview {
+        width: 100%;
+        max-height: 300px;
+        border-radius: 10px;
+        margin-top: 10px;
+        display: none;
+        object-fit: cover;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 10px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+
+      .btn-secondary {
+        background: #f0f0f0;
+        color: #333;
+      }
+
+      .status {
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        text-align: center;
+        font-weight: 600;
+        display: none;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 2px solid #c3e6cb;
+      }
+
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 2px solid #f5c6cb;
+      }
+
+      .status.loading {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 2px solid #bee5eb;
+      }
+
+      .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .file-input-wrapper input[type="file"] {
+        position: absolute;
+        left: -9999px;
+      }
+
+      .file-input-label {
+        display: block;
+        padding: 15px;
+        background: #f0f0f0;
+        color: #333;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s;
+      }
+
+      .file-input-label:active {
+        background: #e0e0e0;
+      }
+
+      .info-box {
+        background: #e7f3ff;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        font-size: 13px;
+        color: #333;
+      }
+
+      .info-box strong {
+        display: block;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🦅 Odin Vision</h1>
+      <p class="subtitle">Test de Detecciones Móvil</p>
+
+      <div class="info-box">
+        <strong>📱 Instrucciones:</strong>
+        1. Configura la IP de tu PC<br />
+        2. Selecciona ubicación y cámara<br />
+        3. Toma una foto<br />
+        4. Envía la detección
+      </div>
+
+      <form id="detectionForm">
+        <div class="form-group">
+          <label for="apiUrl">🌐 IP del Servidor (tu PC)</label>
+          <input
+            type="text"
+            id="apiUrl"
+            placeholder="192.168.1.100:8000"
+            required
+          />
+          <small style="color: #666; font-size: 12px"
+            >Ejemplo: 192.168.1.100:8000</small
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="ubicacionId">📍 ID de Ubicación</label>
+          <input
+            type="text"
+            id="ubicacionId"
+            placeholder="ubicacion_001"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="mac">📡 MAC Address de la Cámara</label>
+          <input
+            type="text"
+            id="mac"
+            placeholder="AA:BB:CC:DD:EE:FF"
+            required
+          />
+        </div>
+
+        <div class="camera-container">
+          <div class="file-input-wrapper">
+            <input
+              type="file"
+              id="imageInput"
+              accept="image/*"
+              capture="environment"
+            />
+            <label for="imageInput" class="file-input-label">
+              📸 Tomar/Seleccionar Foto
+            </label>
+          </div>
+          <img id="preview" alt="Preview" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+          🚀 Enviar Detección
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+          🔄 Limpiar
+        </button>
+      </form>
+
+      <div id="status" class="status"></div>
+    </div>
+
+    <script>
+      const imageInput = document.getElementById("imageInput");
+      const preview = document.getElementById("preview");
+      const form = document.getElementById("detectionForm");
+      const statusDiv = document.getElementById("status");
+
+      // Cargar configuración guardada
+      window.addEventListener("load", () => {
+        const savedApiUrl = localStorage.getItem("apiUrl");
+        const savedUbicacionId = localStorage.getItem("ubicacionId");
+        const savedMac = localStorage.getItem("mac");
+
+        if (savedApiUrl) document.getElementById("apiUrl").value = savedApiUrl;
+        if (savedUbicacionId)
+          document.getElementById("ubicacionId").value = savedUbicacionId;
+        if (savedMac) document.getElementById("mac").value = savedMac;
+      });
+
+      // Preview de imagen
+      imageInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Enviar formulario
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const apiUrl = document.getElementById("apiUrl").value.trim();
+        const ubicacionId = document.getElementById("ubicacionId").value.trim();
+        const mac = document.getElementById("mac").value.trim();
+        const imageFile = imageInput.files[0];
+
+        if (!imageFile) {
+          showStatus("error", "❌ Por favor selecciona una imagen");
+          return;
+        }
+
+        // Guardar configuración
+        localStorage.setItem("apiUrl", apiUrl);
+        localStorage.setItem("ubicacionId", ubicacionId);
+        localStorage.setItem("mac", mac);
+
+        // Preparar FormData
+        const formData = new FormData();
+        formData.append("ubicacion_id", ubicacionId);
+        formData.append("mac", mac);
+        formData.append("image_path", `/mobile/${Date.now()}.jpg`);
+        formData.append("image", imageFile);
+
+        showStatus("loading", "⏳ Enviando detección...");
+
+        try {
+          const response = await fetch(`http://${apiUrl}/detections/upload`, {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showStatus(
+              "success",
+              `✅ ¡Detección enviada! ID: ${data.detection_id}`
+            );
+            setTimeout(() => {
+              resetForm();
+            }, 3000);
+          } else {
+            showStatus("error", `❌ Error: ${data.error || data.message}`);
+          }
+        } catch (error) {
+          showStatus("error", `❌ Error de conexión: ${error.message}`);
+          console.error("Error:", error);
+        }
+      });
+
+      function showStatus(type, message) {
+        statusDiv.className = `status ${type}`;
+        statusDiv.textContent = message;
+        statusDiv.style.display = "block";
+
+        if (type !== "loading") {
+          setTimeout(() => {
+            statusDiv.style.display = "none";
+          }, 5000);
+        }
+      }
+
+      function resetForm() {
+        form.reset();
+        preview.style.display = "none";
+        statusDiv.style.display = "none";
+      }
+    </script>
+  </body>
+</html>
