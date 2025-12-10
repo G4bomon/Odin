@@ -6,11 +6,48 @@ from app.api import api_router
 from app.core.security import fastapi_users
 from app.users.schemas import UserRead, UserUpdate
 import os
+import asyncio
+from contextlib import asynccontextmanager
+
+# Importar configuración y worker de IA
+from app.ai.config import ai_settings
+from app.ai.worker import get_worker
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifecycle events: startup y shutdown
+    """
+    # Startup: Iniciar worker de IA si está habilitado
+    worker_task = None
+    if ai_settings.AI_WORKER_ENABLED:
+        print(f" Iniciando worker de IA (intervalo: {ai_settings.AI_WORKER_INTERVAL}s)")
+        worker = get_worker(
+            interval_seconds=ai_settings.AI_WORKER_INTERVAL,
+            model_path=ai_settings.AI_MODEL_PATH
+        )
+        worker_task = asyncio.create_task(worker.run())
+    
+    yield
+    
+    # Shutdown: Detener worker
+    if worker_task:
+        print(" Deteniendo worker de IA")
+        worker = get_worker()
+        worker.stop()
+        worker_task.cancel()
+        try:
+            await worker_task
+        except asyncio.CancelledError:
+            pass
+
 
 app = FastAPI(
     title="Mi API con FastAPI Users",
     description="API con autenticación, roles y permisos",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Configurar CORS (ajusta según tus necesidades)
@@ -51,7 +88,12 @@ async def health_check():
     """
     Verificar el estado de la API
     """
-    return {"status": "healthy"}
+    return {
+        "status": "healthy",
+        "data":""
+    
+    
+    }
 
 
 @app.get("/mobile", tags=["mobile"])

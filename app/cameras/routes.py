@@ -4,7 +4,7 @@ from typing import List, Optional
 from app.database import get_async_session
 from app.cameras.schemas import CameraCreate, CameraUpdate, CameraRead, CameraWithStats
 from app.cameras.services import CameraService
-from app.ubicaciones.services import UbicacionService
+from app.locations.services import LocationService
 from app.core.security import require_admin, require_empresa
 from app.users.models import User
 
@@ -29,11 +29,11 @@ async def create_camera(
         )
     
     # Verificar que la ubicación existe
-    ubicacion = await UbicacionService.get_ubicacion(db, camera_data.ubicacion_id)
-    if not ubicacion:
+    location = await LocationService.get_location(db, camera_data.location_id)
+    if not location:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Ubicación {camera_data.ubicacion_id} no encontrada"
+            detail=f"Ubicación {camera_data.location_id} no encontrada"
         )
     
     camera = await CameraService.create_camera(db, camera_data)
@@ -44,7 +44,7 @@ async def create_camera(
 async def get_all_cameras(
     skip: int = 0,
     limit: int = 100,
-    ubicacion_id: Optional[int] = None,
+    location_id: Optional[int] = None,
     is_active: Optional[bool] = None,
     db: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(require_empresa)
@@ -52,7 +52,7 @@ async def get_all_cameras(
     """
     Obtener todas las cámaras con filtros (EMPRESA+)
     """
-    cameras = await CameraService.get_all_cameras(db, skip, limit, ubicacion_id, is_active)
+    cameras = await CameraService.get_all_cameras(db, skip, limit, location_id, is_active)
     return cameras
 
 
@@ -120,13 +120,13 @@ async def update_camera(
     """
     Actualizar una cámara (Solo ADMIN+)
     """
-    # Si se actualiza el ubicacion_id, verificar que existe
-    if camera_data.ubicacion_id is not None:
-        ubicacion = await UbicacionService.get_ubicacion(db, camera_data.ubicacion_id)
-        if not ubicacion:
+    # Si se actualiza el location_id, verificar que existe
+    if camera_data.location_id is not None:
+        location = await LocationService.get_location(db, camera_data.location_id)
+        if not location:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Ubicación {camera_data.ubicacion_id} no encontrada"
+                detail=f"Ubicación {camera_data.location_id} no encontrada"
             )
     
     camera = await CameraService.update_camera(db, camera_id, camera_data)

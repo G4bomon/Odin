@@ -5,9 +5,9 @@ from typing import List, Optional
 from app.detections.models import Detection
 from app.detections.schemas import DetectionCreate, DetectionUpdate, DetectionFromCamera, DetectionStats
 from app.cameras.models import Camera
-from app.ubicaciones.models import Ubicacion
+from app.locations.models import Location
 from app.cameras.services import CameraService
-from app.ubicaciones.services import UbicacionService
+from app.locations.services import LocationService
 import os
 import uuid
 from pathlib import Path
@@ -43,10 +43,10 @@ class DetectionService:
         Crear detección desde datos de cámara Hikvision
         Este método maneja la lógica de recepción desde la cámara
         """
-        # Buscar ubicación por ubicacion_id
-        ubicacion = await UbicacionService.get_ubicacion_by_ubicacion_id(db, detection_data.ubicacion_id)
-        if not ubicacion:
-            raise ValueError(f"Ubicación {detection_data.ubicacion_id} no encontrada")
+        # Buscar ubicación por location_id
+        location = await LocationService.get_location_by_location_id(db, detection_data.location_id)
+        if not location:
+            raise ValueError(f"Ubicación {detection_data.location_id} no encontrada")
 
         # Buscar cámara por MAC
         camera = await CameraService.get_camera_by_mac(db, detection_data.mac)
@@ -54,9 +54,9 @@ class DetectionService:
             raise ValueError(f"Cámara con MAC {detection_data.mac} no encontrada")
 
         # Verificar que la cámara pertenece a la ubicación
-        if camera.ubicacion_id != ubicacion.id:
+        if camera.location_id != location.id:
             raise ValueError(
-                f"La cámara {detection_data.mac} no pertenece a la ubicación {detection_data.ubicacion_id}"
+                f"La cámara {detection_data.mac} no pertenece a la ubicación {detection_data.location_id}"
             )
 
         # Guardar imagen si se envió
@@ -82,7 +82,7 @@ class DetectionService:
 
         # Crear detección
         detection = Detection(
-            ubicacion_id=ubicacion.id,
+            location_id=location.id,
             camera_id=camera.id,
             image_path=saved_image_path,
             processed=False
@@ -110,7 +110,7 @@ class DetectionService:
         db: AsyncSession,
         skip: int = 0,
         limit: int = 100,
-        ubicacion_id: Optional[int] = None,
+        location_id: Optional[int] = None,
         camera_id: Optional[int] = None,
         processed: Optional[bool] = None,
         detection_type: Optional[str] = None
@@ -118,8 +118,8 @@ class DetectionService:
         """Obtener todas las detecciones con filtros"""
         query = select(Detection)
         
-        if ubicacion_id is not None:
-            query = query.where(Detection.ubicacion_id == ubicacion_id)
+        if location_id is not None:
+            query = query.where(Detection.location_id == location_id)
         
         if camera_id is not None:
             query = query.where(Detection.camera_id == camera_id)
@@ -244,14 +244,14 @@ class DetectionService:
             return None
 
         # Obtener ubicación
-        ubicacion = await UbicacionService.get_ubicacion(db, detection.ubicacion_id)
+        location = await LocationService.get_location(db, detection.location_id)
         
         # Obtener cámara
         camera = await CameraService.get_camera(db, detection.camera_id)
 
         return {
             **detection.__dict__,
-            "ubicacion_name": ubicacion.name if ubicacion else None,
+            "location_name": location.name if location else None,
             "camera_name": camera.name if camera else None,
             "camera_mac": camera.mac if camera else None
         }

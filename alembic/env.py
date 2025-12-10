@@ -15,6 +15,9 @@ from app.database import Base
 # Importar TODOS los modelos aquí para que Alembic los detecte
 from app.users.models import User
 from app.roles.models import RolePermission
+from app.locations.models import Location
+from app.cameras.models import Camera
+from app.detections.models import Detection
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

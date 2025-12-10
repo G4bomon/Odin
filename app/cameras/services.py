@@ -40,14 +40,14 @@ class CameraService:
         db: AsyncSession,
         skip: int = 0,
         limit: int = 100,
-        ubicacion_id: Optional[int] = None,
+        location_id: Optional[int] = None,
         is_active: Optional[bool] = None
     ) -> List[Camera]:
         """Obtener todas las cámaras con filtros"""
         query = select(Camera)
         
-        if ubicacion_id is not None:
-            query = query.where(Camera.ubicacion_id == ubicacion_id)
+        if location_id is not None:
+            query = query.where(Camera.location_id == location_id)
         
         if is_active is not None:
             query = query.where(Camera.is_active == is_active)

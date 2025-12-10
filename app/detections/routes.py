@@ -13,6 +13,8 @@ from app.detections.schemas import (
     DetectionDetailResponse
 )
 from app.detections.services import DetectionService
+from app.cameras.services import CameraService
+from app.locations.services import LocationService
 from app.core.security import require_empresa
 from app.users.models import User
 import logging
@@ -23,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/upload", response_model=DetectionResponse, status_code=status.HTTP_201_CREATED)
 async def upload_detection_from_camera(
-    ubicacion_id: str = Form(..., description="ID de la ubicación"),
+    location_id: str = Form(..., description="ID de la ubicación"),
     mac: str = Form(..., description="MAC address de la cámara"),
     image_path: str = Form(..., description="Ruta de la imagen"),
     image: Optional[UploadFile] = File(None, description="Archivo de imagen (opcional)"),
@@ -35,7 +37,7 @@ async def upload_detection_from_camera(
     Este endpoint NO requiere autenticación para permitir que las cámaras/móviles envíen datos.
     
     **Formato esperado (multipart/form-data):**
-    - ubicacion_id: ID de la ubicación (ej: "ubicacion_001")
+    - location_id: ID de la ubicación (ej: "location_001")
     - mac: MAC address de la cámara (ej: "AA:BB:CC:DD:EE:FF")
     - image_path: Ruta de la imagen en el sistema de la cámara
     - image: Archivo de imagen (binario)
@@ -43,7 +45,7 @@ async def upload_detection_from_camera(
     **Ejemplo con cURL:**
     ```bash
     curl -X POST "http://localhost:8000/detections/upload" \\
-      -F "ubicacion_id=ubicacion_001" \\
+      -F "location_id=location_001" \\
       -F "mac=AA:BB:CC:DD:EE:FF" \\
       -F "image_path=/path/to/image.jpg" \\
       -F "image=@image.jpg"
@@ -72,7 +74,7 @@ async def upload_detection_from_camera(
         
         # Crear objeto de datos
         detection_data = DetectionFromCamera(
-            ubicacion_id=ubicacion_id,
+            location_id=location_id,
             mac=mac,
             image_path=image_path
         )
@@ -84,7 +86,7 @@ async def upload_detection_from_camera(
             image_data
         )
         
-        logger.info(f"Detección creada: ID={detection.id}, Ubicación={ubicacion_id}, MAC={mac}")
+        logger.info(f"Detección creada: ID={detection.id}, Ubicación={location_id}, MAC={mac}")
         
         return DetectionResponse(
             success=True,
@@ -124,7 +126,7 @@ async def create_detection(
 async def get_all_detections(
     skip: int = 0,
     limit: int = 100,
-    ubicacion_id: Optional[int] = None,
+    location_id: Optional[int] = None,
     camera_id: Optional[int] = None,
     processed: Optional[bool] = None,
     detection_type: Optional[str] = None,
@@ -135,7 +137,7 @@ async def get_all_detections(
     Obtener todas las detecciones con filtros (EMPRESA+)
     """
     detections = await DetectionService.get_all_detections(
-        db, skip, limit, ubicacion_id, camera_id, processed, detection_type
+        db, skip, limit, location_id, camera_id, processed, detection_type
     )
     return detections
 
@@ -190,17 +192,14 @@ async def get_detection_details(
         )
     
     # Obtener información de la cámara y ubicación
-    from app.cameras.services import CameraService
-    from app.ubicaciones.services import UbicacionService
-    
     camera = await CameraService.get_camera(db, detection.camera_id)
-    ubicacion = await UbicacionService.get_ubicacion(db, detection.ubicacion_id)
+    location = await LocationService.get_location(db, detection.location_id)
     
     # Construir respuesta en formato similar al de la cámara
     return DetectionDetailResponse(
         endpoint="POST /detections/upload",
         body={
-            "ubicacion_id": ubicacion.ubicacion_id if ubicacion else None,
+            "location_id": location.location_id if location else None,
             "mac": camera.mac if camera else None,
             "image_path": detection.image_path
         },
@@ -209,7 +208,7 @@ async def get_detection_details(
         },
         metadata={
             "detection_id": detection.id,
-            "ubicacion_name": ubicacion.name if ubicacion else None,
+            "location_name": location.name if location else None,
             "camera_name": camera.name if camera else None,
             "camera_model": camera.model if camera else None,
             "camera_orientation": camera.orientacion if camera else None,
@@ -220,7 +219,7 @@ async def get_detection_details(
                 "api_url": "tu_puta_api_rul",
                 # "api_url": f"{current_user.email.split('@')[0]}_api_url",  # Placeholder, ajustar según settings
                 "camera_mac": camera.mac if camera else None,
-                "ubicacion_id": ubicacion.ubicacion_id if ubicacion else None,
+                "location_id": location.location_id if location else None,
                 "error_log_file": "logs/api_404_errors.jsonl"
             }
         }

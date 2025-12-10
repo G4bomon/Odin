@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any
 
 class DetectionBase(BaseModel):
     """Schema base para Detección"""
-    ubicacion_id: int = Field(..., description="ID de la ubicación")
+    location_id: int = Field(..., description="ID de la ubicación")
     camera_id: int = Field(..., description="ID de la cámara")
     image_path: str = Field(..., max_length=500, description="Ruta de la imagen")
     detection_type: Optional[str] = Field(None, max_length=50, description="Tipo de detección")
@@ -23,7 +23,7 @@ class DetectionFromCamera(BaseModel):
     Schema para recibir detección desde la cámara Hikvision
     Este es el formato que enviará la cámara
     """
-    ubicacion_id: str = Field(..., description="ID de la ubicación (ej: ubicacion_001)")
+    location_id: str = Field(..., description="ID de la ubicación (ej: location_001)")
     mac: str = Field(..., description="MAC address de la cámara")
     image_path: str = Field(..., description="Ruta de la imagen en el sistema de la cámara")
 
@@ -37,7 +37,7 @@ class DetectionUpdate(BaseModel):
 class DetectionRead(BaseModel):
     """Schema para leer una detección (simplificado)"""
     id: int
-    ubicacion_id: int
+    location_id: int
     camera_id: int
     image_path: str
     detection_type: Optional[str] = None
@@ -50,7 +50,7 @@ class DetectionRead(BaseModel):
 
 class DetectionWithDetails(DetectionRead):
     """Schema de detección con detalles de ubicación y cámara"""
-    ubicacion_name: Optional[str] = None
+    location_name: Optional[str] = None
     camera_name: Optional[str] = None
     camera_mac: Optional[str] = None
 

@@ -11,7 +11,7 @@ class CameraBase(BaseModel):
     model: Optional[str] = Field(None, max_length=100, description="Modelo de la cámara")
     ip_address: Optional[str] = Field(None, max_length=15, description="Dirección IP de la cámara")
     orientacion: Optional[str] = Field(None, max_length=100, description="Orientación/ángulo de la cámara (ej: 'Norte', '45° Este', 'Entrada principal')")
-    ubicacion_id: int = Field(..., description="ID de la ubicación donde está instalada")
+    location_id: int = Field(..., description="ID de la ubicación donde está instalada")
     is_active: bool = Field(True, description="Estado de la cámara")
 
     @field_validator('mac')
@@ -50,7 +50,7 @@ class CameraUpdate(BaseModel):
     model: Optional[str] = Field(None, max_length=100)
     ip_address: Optional[str] = Field(None, max_length=15)
     orientacion: Optional[str] = Field(None, max_length=100)
-    ubicacion_id: Optional[int] = None
+    location_id: Optional[int] = None
     is_active: Optional[bool] = None
 
     @field_validator('ip_address')
