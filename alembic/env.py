@@ -14,7 +14,8 @@ from app.config import settings
 from app.database import Base
 # Importar TODOS los modelos aquí para que Alembic los detecte
 from app.users.models import User
-from app.products.models import Product  # Agregar import
+from app.products.models import Product # Agregar import
+from app.cameras.models import Camera
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

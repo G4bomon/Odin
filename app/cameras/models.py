@@ -15,7 +15,7 @@ class Camera(Base):
     puerto: Mapped[int] = mapped_column(Integer, nullable=False)
     orientacion: Mapped[str] = mapped_column(String(50), nullable=True)
     mac: Mapped[str] = mapped_column(String(50), unique=False, nullable=False, index=True)
-    patio_id: Mapped[int] = mapped_column(Integer, ForeignKey("patios.id"), nullable=True)
+    patio_id: Mapped[int] = mapped_column(Integer)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=False), default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=False), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
